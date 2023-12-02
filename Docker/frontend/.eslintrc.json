@@ -1,0 +1,43 @@
+{
+    "root": true,
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:jsx-a11y/recommended"
+    ],
+    "plugins": ["react", "jsx-a11y"],
+    "rules": {
+      "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-uses-react": "off",
+      "react/jsx-uses-vars": "error",
+      "jsx-a11y/anchor-is-valid": [
+        "error",
+        {
+          "components": ["Link"],
+          "specialLink": ["to"]
+        }
+      ],
+      "quotes": ["error", "single"],
+      "indent": ["error", 2],
+      "no-unused-vars": [
+        "error",
+        {
+          "args": "none"
+        }
+      ],
+      "no-debugger": "warn"
+    }
+}
+  

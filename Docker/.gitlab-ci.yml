@@ -1,0 +1,70 @@
+workflow:
+  name: microservice deployment pipeline
+
+variables:
+  FRONTEND_TAG: "1.0.0"
+  BACKEND_TAG: "1.0.0"
+  SVC_DIR: "microservices"
+
+stages:
+  - test
+  - build
+  - deploy
+
+.build and push template: &build_push_template
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - cd "${SVC_DIR}/${APP}"
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+  
+.frontend: &frontend
+  variables:
+    APP: "frontend"
+
+.backend: &backend
+  variables:
+    APP: "backend"
+
+test frontend microservice:
+  <<: *frontend
+  stage: test
+  image: node:18.15
+  before_script:
+    - cd "${SVC_DIR}/${APP}"
+    - npm install eslint
+  script:
+    - npm run lint
+
+build and push frontend service:
+  <<: *build_push_template
+  <<: *frontend
+  needs:
+    - test frontend microservice
+  script:
+    - docker build -t "${DOCKERHUB_USERNAME}/frontend:${FRONTEND_TAG}" .
+    - docker push "${DOCKERHUB_USERNAME}/frontend:${FRONTEND_TAG}"
+
+build and push backend service:
+  <<: *build_push_template
+  <<: *backend
+  script:
+    - docker build -t "${DOCKERHUB_USERNAME}/backend:${BACKEND_TAG}" .
+    - docker push "${DOCKERHUB_USERNAME}/backend:${BACKEND_TAG}"
+
+test microservices:
+  stage: test
+  script:
+    - echo "test microservices"
+
+deploy microservices:
+  stage: deploy
+  only:
+    - "production"
+  needs:
+    - test microservices
+  script:
+    - ""
+  
